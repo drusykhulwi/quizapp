@@ -1,10 +1,66 @@
-questions = (
-    "Which one is not a state of matter?: ",
-    "At what temperature are celcius and farenheit equal?: ",
-    "How many bones are in the human body: ",
-    "What is the only metal that is liquid at room temperature?: ",
-    "What is the chemical symbol for the element gold?: ",
-)
+def new_game():
+    guesses = []
+    correct_guesses = 0
+    question_num = 1
+
+    for key in questions:
+        print("***********************")
+        print(key)
+        for i in options[question_num-1]:
+            print(i)
+        guess = input("Enter (A, B, C or D): ").upper()
+        guesses.append(guess) 
+
+        correct_guesses += check_answer(questions.get(key), guess)  
+        question_num += 1   
+        
+    display_score(correct_guesses, guesses)        
+
+
+def check_answer(answer, guess):
+    
+    if answer == guess:
+        print("CORRECT")
+        return 1
+    else:
+        print("INCORRECT!")
+        return 0
+    
+
+def display_score(correct_guesses, guesses):
+    print("------------------")
+    print("RESULTS")
+    print("------------------")
+
+    print("Answers: ", end="")
+    for i in questions:
+        print(questions.get(i), end=" ")
+    print()    
+
+    print("Guesses: ", end="") 
+    for i in guesses:
+        print(i, end=" ")
+    print()    
+
+    score = int(correct_guesses / len(questions)* 100) 
+    print(f"Your score is {score}%")
+
+def play_again():
+    response = input("Do you want to play again? (yes or no): ").upper()
+    
+    if response == "YES":
+        return True
+    else:
+        return False
+    
+
+questions = {
+    "Which one is not a state of matter?: " : "C",
+    "At what temperature are celcius and farenheit equal?: " : "A",
+    "How many bones are in the human body: " : "D",
+    "What is the only metal that is liquid at room temperature?: " : "A",
+    "What is the chemical symbol for the element gold?: ": "B",
+}
 
 # make a 2D tuple of answers we have four options
 options = (
@@ -38,37 +94,11 @@ options = (
         "C. Li",
         "D.Al"
     ),
-) 
+)     
 
-answers = ("C", "A", "D", "A", "B")
+new_game()
 
-guesses = []
+while play_again():
+    new_game()
 
-score = 0
-
-question_num = 0
-
-for question in questions:
-    print("********************")
-    print(question)
-    for option in options[question_num]:
-        print(option)
-
-    guess = input("Enter (A, B, C, D): ").upper()
-    guesses.append(guess)
-    if guess == answers[question_num]:
-        score += 1
-        print("CORRECT!")
-    else:
-        print("INCORRECT!")
-        print(f"{answers[question_num]} is the correct answer")    
-    question_num += 1    
-
-score = score / len(questions) * 100
-
-if score >= 70 :
-    print(f"Your score is {score}%, Excellent!")
-elif score >= 50 :
-    print(f"Your score is {score}%,Good Try!")    
-else:
-    print(f"Your score is {score}%,You'll get it next time!")    
+print("Thank you for playing! Bye")    
