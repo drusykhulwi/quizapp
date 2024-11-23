@@ -40,7 +40,7 @@ options = (
     ),
 ) 
 
-answers = ()
+answers = ("C", "A", "D", "A", "B")
 
 guesses = []
 
