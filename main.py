@@ -1,104 +1,106 @@
-def new_game():
-    guesses = []
-    correct_guesses = 0
-    question_num = 1
+import tkinter as tk
+from tkinter import messagebox
 
-    for key in questions:
-        print("***********************")
-        print(key)
-        for i in options[question_num-1]:
-            print(i)
-        guess = input("Enter (A, B, C or D): ").upper()
-        guesses.append(guess) 
+class QuizApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Druel Quiz Game")
+        self.root.geometry("600x500")
+        self.root.configure(bg='navy')
+        icon = tk.PhotoImage(file='./logo.PNG')
+        self.root.iconphoto(True, icon)
 
-        correct_guesses += check_answer(questions.get(key), guess)  
-        question_num += 1   
+        # Header frame for title and logo
+        # self.header_frame = tk.Frame(root, bg='navy')
+        # self.header_frame.pack(pady=10)
+
+        # Add logo
+        # self.logo = tk.PhotoImage(file='./logo.PNG') 
+        # self.logo_label = tk.Label(self.header_frame, image=self.logo, bg='navy')
+        # self.logo_label.pack(side=tk.LEFT, padx=10)
+
+        # Title
+        # self.title_label = tk.Label(self.header_frame, text="Quiz Game", font=("Arial", 24), bg='navy', fg='white')
+        # self.title_label.pack(side=tk.LEFT)
+
+        self.questions = {
+            "Which one is not a state of matter?: " : "C",
+            "At what temperature are Celsius and Fahrenheit equal?: " : "A",
+            "How many bones are in the human body?: " : "D",
+            "What is the only metal that is liquid at room temperature?: " : "A",
+            "What is the chemical symbol for the element gold?: " : "B",
+        }
         
-    display_score(correct_guesses, guesses)        
+        self.options = (
+            ("A. Solid", "B. Gas", "C. Temperature", "D. Liquid"), 
+            ("A. -40", "B. 35", "C. 40", "D. 0"),
+            ("A. 500", "B. 10", "C. 75", "D. 206"),
+            ("A. Mercury", "B. Bronze", "C. Lead", "D. Copper"),
+            ("A. Be", "B. Au", "C. Li", "D. Al"),
+        )
 
+        self.guesses = []
+        self.correct_guesses = 0
+        self.question_num = 0
 
-def check_answer(answer, guess):
-    
-    if answer == guess:
-        print("CORRECT")
-        return 1
-    else:
-        print("INCORRECT!")
-        return 0
-    
+        self.question_label = tk.Label(root, text="", font=("Arial", 16), bg='navy', fg='white')
+        self.question_label.pack(pady=20)
 
-def display_score(correct_guesses, guesses):
-    print("------------------")
-    print("RESULTS")
-    print("------------------")
+        self.options_var = tk.StringVar(value="")
 
-    print("Answers: ", end="")
-    for i in questions:
-        print(questions.get(i), end=" ")
-    print()    
+        self.radio_buttons = []
+        for i in range(4):
+            rb = tk.Radiobutton(root, text="", variable=self.options_var, value=chr(65 + i), font=("Arial", 12), bg='navy', fg='white', selectcolor='navy')
+            rb.pack(anchor='w')
+            self.radio_buttons.append(rb)
 
-    print("Guesses: ", end="") 
-    for i in guesses:
-        print(i, end=" ")
-    print()    
+        # Submit Button
+        self.submit_button = tk.Button(root, text="Submit", command=self.submit_answer, font=("Arial", 12, "bold"), bg='navy', fg='white', activebackground='white', activeforeground='navy', relief=tk.RAISED, bd=3, padx=10, pady=5)
+        self.submit_button.pack(pady=20)
 
-    score = int(correct_guesses / len(questions)* 100) 
-    print(f"Your score is {score}%")
+        self.result_label = tk.Label(root, text="", font=("Arial", 14), bg='navy', fg='white')
+        self.result_label.pack(pady=20)
 
-def play_again():
-    response = input("Do you want to play again? (yes or no): ").upper()
-    
-    if response == "YES":
-        return True
-    else:
-        return False
-    
+        # Next Button
+        
+        self.next_button = tk.Button(root, text="Next", command=self.next_question, font=("Arial", 12, "bold"), bg='navy', fg='white', activebackground='white', activeforeground='navy', relief=tk.RAISED, bd=3, padx=10, pady=5)
+        self.next_button.pack(pady=20)
+        
+        
 
-questions = {
-    "Which one is not a state of matter?: " : "C",
-    "At what temperature are celcius and farenheit equal?: " : "A",
-    "How many bones are in the human body: " : "D",
-    "What is the only metal that is liquid at room temperature?: " : "A",
-    "What is the chemical symbol for the element gold?: ": "B",
-}
+        self.display_question()
 
-# make a 2D tuple of answers we have four options
-options = (
-    (
-        "A. Solid",
-        "B. Gas", 
-        "C. Temperature",
-        "D.Liquid"
-    ), 
-    (
-        "A.-40", 
-        "B.35", 
-        "C.40",
-        "D.0"
-    ),
-    (
-        "A.500", 
-        "B.10", 
-        "C.75",
-        "D.206"
-    ),
-    (
-        "A.Mercury", 
-        "B.Bronze", 
-        "C.Lead",
-        "D.Copper"
-    ),
-    (
-        "A.Be", 
-        "B.Au", 
-        "C. Li",
-        "D.Al"
-    ),
-)     
+    def display_question(self):
+        if self.question_num < len(self.questions):
+            question = list(self.questions.keys())[self.question_num]
+            self.question_label.config(text=question)
+            for i, option in enumerate(self.options[self.question_num]):
+                self.radio_buttons[i].config(text=option)
+        else:
+            self.display_score()
 
-new_game()
+    def submit_answer(self):
+        guess = self.options_var.get()
+        self.guesses.append(guess)
+        if guess == list(self.questions.values())[self.question_num]:
+            self.correct_guesses += 1
+        self.result_label.config(text="CORRECT" if guess == list(self.questions.values())[self.question_num] else "INCORRECT!")
 
-while play_again():
-    new_game()
+    def next_question(self):
+        self.question_num += 1
+        self.options_var.set("")
+        self.result_label.config(text="")
+        if self.question_num < len(self.questions):
+            self.display_question()
+        else:
+            self.display_score()
 
-print("Thank you for playing! Bye")    
+    def display_score(self):
+        score = int(self.correct_guesses / len(self.questions) * 100)
+        messagebox.showinfo("Results", f"Your score is {score}%\nThank you for playing!")
+        self.root.destroy()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuizApp(root)
+    root.mainloop()
